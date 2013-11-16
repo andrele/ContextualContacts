@@ -6,56 +6,118 @@
     android:weightSum="1"
     tools:context=".MainActivity" >
 
-    <ScrollView
-        android:id="@+id/scrollView1"
+    <TabHost
+        android:id="@android:id/tabhost"
         android:layout_width="match_parent"
         android:layout_height="match_parent" >
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical" >
 
-            <ImageButton
-                android:id="@+id/imageButton2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:padding="0dp"
-                android:src="@drawable/stevejobs" />
-
-            <EditText
-                android:id="@+id/editText1"
+            <TabWidget
+                android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Name"
-                android:inputType="textPersonName" />
+                android:layout_height="wrap_content" >
+            </TabWidget>
 
-            <EditText
-                android:id="@+id/editText2"
+            <FrameLayout
+                android:id="@android:id/tabcontent"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Phone Number"
-                android:inputType="phone" />
+                android:layout_height="match_parent" >
 
-            <EditText
-                android:id="@+id/editText3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:hint="Email Address"
-                android:inputType="textEmailAddress" />
+                <LinearLayout
+                    android:id="@+id/tab1"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="You are here"
-                android:textAppearance="?android:attr/textAppearanceLarge" />
+                    <ScrollView
+                        android:id="@+id/scrollView1"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" >
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical" >
+
+                            <ImageButton
+                                android:id="@+id/imageButtonAvatar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:padding="0dp"
+                                android:src="@drawable/stevejobs" />
+
+                            <EditText
+                                android:id="@+id/editTextName"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ems="10"
+                                android:hint="Name"
+                                android:inputType="textPersonName" >
+
+                                <requestFocus />
+                            </EditText>
+
+                            <EditText
+                                android:id="@+id/editTextPhone"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ems="10"
+                                android:hint="Phone Number"
+                                android:inputType="phone" />
+
+                            <EditText
+                                android:id="@+id/editTextEmail"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:ems="10"
+                                android:hint="Email Address"
+                                android:inputType="textEmailAddress" />
+
+                            <TextView
+                                android:id="@+id/textView1"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text="You are here"
+                                android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" >
+
+                                <Button
+                                    android:id="@+id/btnCancel"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp"
+                                    android:layout_weight="0.5"
+                                    android:text="Cancel" />
+
+                                <Button
+                                    android:id="@+id/btnSave"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="10dp"
+                                    android:layout_weight="0.5"
+                                    android:text="Save" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </ScrollView>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tab2"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:paddingTop="60dp" >
+
+                </LinearLayout>
+            </FrameLayout>
         </LinearLayout>
-    </ScrollView>
+    </TabHost>
 
 </LinearLayout>
-
