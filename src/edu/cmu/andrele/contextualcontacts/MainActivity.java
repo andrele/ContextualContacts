@@ -1,9 +1,13 @@
 package edu.cmu.andrele.contextualcontacts;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -12,18 +16,27 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
 import android.view.Window;
+import android.widget.ImageButton;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
@@ -44,94 +57,15 @@ public class MainActivity extends Activity implements LocationListener{
 	Location location;
 	String provider;
 	
+	// Camera properties
+	public static final int MEDIA_TYPE_IMAGE = 1;
+	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
+	private Uri fileUri;
+	public ImageButton imageButtonAvatar;
+	
 	private boolean isGpsEnabled;
 	private boolean isLocationNetworkEnabled;
 
-//	private void locationSetup() {
-//		// set the location manager
-//		try {
-//			locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
-//			
-//			// Initialize the fine criteria for location providers
-//			Criteria fine = new Criteria();
-//			fine.setAccuracy(Criteria.ACCURACY_FINE);
-//			fine.setAltitudeRequired(false);
-//			fine.setBearingRequired(false);
-//			fine.setSpeedRequired(true);
-//			fine.setCostAllowed(true);
-//			fine.setPowerRequirement(Criteria.POWER_HIGH);
-//			
-//			// Initialize the coarse criteria for location providers
-//			Criteria coarse = new Criteria();
-//			coarse.setAccuracy(Criteria.ACCURACY_COARSE);
-//			coarse.setPowerRequirement(Criteria.POWER_LOW);
-//			
-//			// Set gps update distance and time
-//			int GPS_TIMEUPDATE = 1500;
-//			int GPS_DISTANCEUPDATE = 7;
-//			
-//			// get last known location
-//			String provider = locationManager.getBestProvider(coarse, true);
-//			location = locationManager.getLastKnownLocation(provider);
-//			
-//			// setup listener
-//			if (listenerFine == null || listenerCoarse == null) {
-//				createLocationListeners();
-//			}
-//			
-//			if (listenerFine != null) {
-//				locationManager.requestLocationUpdates(locationManager.getBestProvider(fine, true), GPS_TIMEUPDATE, GPS_DISTANCEUPDATE, listenerFine);
-//			}
-//			
-//			if (listenerCoarse != null) {
-//				locationManager.requestLocationUpdates(locationManager.getBestProvider(coarse, true), GPS_TIMEUPDATE, GPS_DISTANCEUPDATE, listenerCoarse);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
-//	
-//	private void createLocationListeners(){
-//		
-//		listenerFine = new LocationListener() {
-//			public void onStatusChanged(String provider, int status, Bundle extras) {}
-//			public void onProviderEnabled(String provider) {}
-//			public void onProviderDisabled(String provider) {}
-//			public void onLocationChanged(Location location) {
-//				if (location.getAccuracy() > 500 && location.hasAccuracy()){
-//					locationManager.removeUpdates(listenerFine);
-//				} else {
-//					// Do something else with location updates
-//					Log.d("Andre", "Fine location updated!");
-//					if (isNetworkAvailable()) {
-//						new FoursquareChecker().execute(url);
-//					}
-//				}
-//			}
-//		};
-//		
-//		listenerCoarse = new LocationListener() {
-//			public void onStatusChanged(String provider, int status, Bundle extras) {}
-//			public void onProviderEnabled(String provider) {}
-//			public void onProviderDisabled(String provider) {}
-//			public void onLocationChanged(Location location) {
-//				if (location.getAccuracy() < 500 && location.hasAccuracy()){
-//					locationManager.removeUpdates(listenerCoarse);
-//				} else {
-//					// Do something else with location updates
-//					Log.d("Andre", "Coarse location updated!");
-//					if (isNetworkAvailable()) {
-//						new FoursquareChecker().execute(url);
-//					}
-//				}
-//			}
-//		};
-//	}
-//	
-//	private void stopListening() {
-//		locationManager.removeUpdates(this);
-//	}
-//	
 	private boolean isNetworkAvailable() {
 	    ConnectivityManager connectivityManager 
 	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -139,12 +73,64 @@ public class MainActivity extends Activity implements LocationListener{
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 	
+	/** Create a file Uri for saving an image or video */
+	private static Uri getOutputMediaFileUri(int type){
+	      return Uri.fromFile(getOutputMediaFile(type));
+	}
+
+	/** Create a File for saving an image or video */
+	private static File getOutputMediaFile(int type){
+	    // To be safe, you should check that the SDCard is mounted
+	    // using Environment.getExternalStorageState() before doing this.
+
+	    File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+	              Environment.DIRECTORY_PICTURES), "ContextualContacts");
+	    // This location works best if you want the created images to be shared
+	    // between applications and persist after your app has been uninstalled.
+
+	    // Create the storage directory if it does not exist
+	    if (! mediaStorageDir.exists()){
+	        if (! mediaStorageDir.mkdirs()){
+	            Log.d("MyCameraApp", "failed to create directory");
+	            return null;
+	        }
+	    }
+
+	    // Create a media file name
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    File mediaFile;
+	    if (type == MEDIA_TYPE_IMAGE){
+	        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+	        "IMG_"+ timeStamp + ".jpg");
+	    } else {
+	        return null;
+	    }
+
+	    return mediaFile;
+	}
+	
+	private void dispatchImageCaptureIntent() {
+		// Setup camera intent
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+	}
+	
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// Remove the title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+		setContentView(R.layout.activity_main);
 		
+		// Set up GPS and network checks
+//		isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+//		isLocationNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		
+		// Setup location services
 		locationTextView = (TextView)findViewById(R.id.textView1);
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		
@@ -159,13 +145,14 @@ public class MainActivity extends Activity implements LocationListener{
 //			locationTextView.setText("Searching nearby...");
 		}
 		
-		// Set up GPS and network checks
-//		isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		isLocationNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
-				
-
-		setContentView(R.layout.activity_main);
-
+		imageButtonAvatar = (ImageButton)findViewById(R.id.imageButtonAvatar);
+		
+		imageButtonAvatar.setOnClickListener(new ImageButton.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				dispatchImageCaptureIntent();
+			}
+		});
 		
 		TabHost tabHost=(TabHost)findViewById(android.R.id.tabhost);
 		tabHost.setup();
@@ -184,6 +171,37 @@ public class MainActivity extends Activity implements LocationListener{
 		lastResponse = null;
 
 		Log.d("andre", "OnCreate called");
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE) {
+			  // Image captured and saved to fileUri specified in the Intent
+			Toast.makeText(this, "Image saved", Toast.LENGTH_LONG).show();
+			
+			try {
+				ContentResolver cr = getContentResolver();
+				InputStream in = cr.openInputStream(fileUri);
+				BitmapFactory.Options options = new BitmapFactory.Options();
+				options.inSampleSize=4;
+				options.inScaled=true;
+				Bitmap thumb = BitmapFactory.decodeStream(in, null, options);
+				imageButtonAvatar.setImageBitmap(thumb);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			
+        } else if (resultCode == RESULT_CANCELED) {
+            // User cancelled the image capture
+            Toast.makeText(this, "Image capture cancelled.", Toast.LENGTH_LONG).show();
+        } else {
+            // Image capture failed, advise user
+            Toast.makeText(this, "Image capture failed.", Toast.LENGTH_LONG).show();
+
+        }
 	}
 	
 	@Override
