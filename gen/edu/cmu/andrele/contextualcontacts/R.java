@@ -26,7 +26,7 @@ public final class R {
     }
     public static final class id {
         public static final int action_settings=0x7f08000a;
-        public static final int btnCancel=0x7f080007;
+        public static final int btnClear=0x7f080007;
         public static final int btnSave=0x7f080008;
         public static final int editTextEmail=0x7f080005;
         public static final int editTextName=0x7f080003;
