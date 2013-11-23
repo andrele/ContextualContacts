@@ -18,6 +18,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.app.ListActivity;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -33,6 +34,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -159,6 +161,7 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 			venueStrings.add(locationTextView.getText().toString());
 			Uri newUri = Uri.parse("");
 			contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
+			addToContacts(contact);
 			adapter.add(contact);
 			adapter.notifyDataSetChanged();
 			break;
@@ -383,6 +386,81 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
 
 		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+	}
+	
+	private void addToContacts(CContact contact) {
+		String DisplayName = contact.fullName;
+		 String MobileNumber = contact.phoneNumber;
+		 String HomeNumber = "";
+		 String WorkNumber = "";
+		 String emailID = contact.emailAddress;
+		 String company = "";
+		 String jobTitle = "";
+
+		 ArrayList < ContentProviderOperation > ops = new ArrayList < ContentProviderOperation > ();
+
+		 ops.add(ContentProviderOperation.newInsert(
+		 ContactsContract.RawContacts.CONTENT_URI)
+		     .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+		     .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+		     .build());
+
+		 //------------------------------------------------------ Names
+		 if (DisplayName != null) {
+		     ops.add(ContentProviderOperation.newInsert(
+		     ContactsContract.Data.CONTENT_URI)
+		         .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+		         .withValue(ContactsContract.Data.MIMETYPE,
+		     ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+		         .withValue(
+		     ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
+		     DisplayName).build());
+		 }
+
+		 //------------------------------------------------------ Mobile Number                     
+		 if (MobileNumber != null) {
+		     ops.add(ContentProviderOperation.
+		     newInsert(ContactsContract.Data.CONTENT_URI)
+		         .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+		         .withValue(ContactsContract.Data.MIMETYPE,
+		     ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+		         .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, MobileNumber)
+		         .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
+		     ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+		         .build());
+		 }
+
+		 //------------------------------------------------------ Email
+		 if (emailID != null) {
+		     ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		         .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+		         .withValue(ContactsContract.Data.MIMETYPE,
+		     ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+		         .withValue(ContactsContract.CommonDataKinds.Email.DATA, emailID)
+		         .withValue(ContactsContract.CommonDataKinds.Email.TYPE, ContactsContract.CommonDataKinds.Email.TYPE_WORK)
+		         .build());
+		 }
+
+		 //------------------------------------------------------ Organization
+		 if (!company.equals("") && !jobTitle.equals("")) {
+		     ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+		         .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+		         .withValue(ContactsContract.Data.MIMETYPE,
+		     ContactsContract.CommonDataKinds.Organization.CONTENT_ITEM_TYPE)
+		         .withValue(ContactsContract.CommonDataKinds.Organization.COMPANY, company)
+		         .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+		         .withValue(ContactsContract.CommonDataKinds.Organization.TITLE, jobTitle)
+		         .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
+		         .build());
+		 }
+
+		 // Asking the Contact provider to create a new contact                 
+		 try {
+		     getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+		 } catch (Exception e) {
+		     e.printStackTrace();
+		     Toast.makeText(this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+		 }
 	}
 
 }

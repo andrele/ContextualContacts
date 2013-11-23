@@ -86,4 +86,6 @@ public class CContact {
 	public String toString() {
 		return fullName + " Phone: " + phoneNumber + " Email: " + emailAddress;
 	}
+	
+	
 }
