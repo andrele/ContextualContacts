@@ -8,12 +8,13 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 
 public class ContactsDataSource {
 	// Database fields
 	private SQLiteDatabase database;
 	private MySQLiteHelper dbHelper;
-	private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_CONTACT };
+	private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_NAME, MySQLiteHelper.COLUMN_PHONE, MySQLiteHelper.COLUMN_EMAIL, MySQLiteHelper.COLUMN_IMAGEURI, MySQLiteHelper.COLUMN_LATITUDE, MySQLiteHelper.COLUMN_LONGITUDE, MySQLiteHelper.COLUMN_VENUES };
 	
 	public ContactsDataSource(Context context) {
 		dbHelper = new MySQLiteHelper(context);
@@ -27,9 +28,25 @@ public class ContactsDataSource {
 		dbHelper.close();
 	}
 	
-	public CContact createContact(String fullName) {
+	public String arrayToCSV(ArrayList<String> array) {
+		String csvString = "";
+		if (array != null && !array.isEmpty()) {
+			for (String item : array) {
+				csvString += item + ", ";
+			}
+		}
+		return csvString;
+	}
+	
+	public CContact createContact( String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
 		ContentValues values = new ContentValues();
-		values.put(MySQLiteHelper.COLUMN_CONTACT, fullName);
+		values.put(MySQLiteHelper.COLUMN_NAME, fullName);
+		values.put(MySQLiteHelper.COLUMN_PHONE, phoneNumber);
+		values.put(MySQLiteHelper.COLUMN_EMAIL, emailAddress);
+		values.put(MySQLiteHelper.COLUMN_IMAGEURI, imageUri.toString());
+		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
+		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
+		values.put(MySQLiteHelper.COLUMN_VENUES, arrayToCSV(venues));
 		long insertId = database.insert(MySQLiteHelper.TABLE_CONTACTS, null, values);
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_CONTACTS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
 		cursor.moveToFirst();
@@ -48,7 +65,6 @@ public class ContactsDataSource {
 		List<CContact> contacts = new ArrayList<CContact>();
 		
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_CONTACTS, allColumns, null, null, null, null, null);
-		
 		cursor.moveToFirst();
 		while (!cursor.isAfterLast()) {
 			CContact contact = cursorToContact(cursor);
@@ -63,7 +79,13 @@ public class ContactsDataSource {
 	private CContact cursorToContact(Cursor cursor) {
 		CContact contact = new CContact();
 		contact.setId(cursor.getLong(0));
-		contact.setContact(cursor.getString(1));
+		contact.setName(cursor.getString(1));
+		contact.setPhone(cursor.getString(2));
+		contact.setEmail(cursor.getString(3));
+		contact.setImageURI(cursor.getString(4));
+		contact.setLat(cursor.getFloat(5));
+		contact.setLong(cursor.getFloat(6));
+		contact.setVenuesFromString(cursor.getString(7));
 		return contact;
 	}
 }
