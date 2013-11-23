@@ -162,9 +162,12 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 			venueStrings.add(locationTextView.getText().toString());
 			Uri newUri = Uri.parse("");
 			contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
-			addToContacts(contact);
-			adapter.add(contact);
-			adapter.notifyDataSetChanged();
+			if (contact != null) {
+				addToContacts(contact);
+				adapter.add(contact);
+				adapter.notifyDataSetChanged();
+				Toast.makeText(this, contact.fullName + " was saved in your contacts", Toast.LENGTH_LONG).show();
+			}
 			break;
 		case R.id.imageButtonAvatar:
 			dispatchImageCaptureIntent();
