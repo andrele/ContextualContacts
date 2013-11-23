@@ -101,12 +101,13 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		List<CContact> values = datasource.getAllContacts();
 		
 		// Use SimpleCursorAdapter to show the elements in ListView
-		ArrayAdapter<CContact> adapter = new ArrayAdapter<CContact>(this, android.R.layout.simple_list_item_1, values);
+//		ArrayAdapter<CContact> adapter = new ArrayAdapter<CContact>(this, android.R.layout.simple_list_item_1, values);
+		ContactArrayAdapter adapter = new ContactArrayAdapter(this, values);
 		setListAdapter(adapter);
 		
 		
 		// Setup location services
-		locationTextView = (TextView)findViewById(R.id.textView1);
+		locationTextView = (TextView)findViewById(R.id.listItemName);
 		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 		
 		Criteria criteria = new Criteria();
@@ -208,7 +209,7 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		super.onResume();
 		locationManager.requestLocationUpdates(provider, 400, 1, this);
 		Log.d("Andre", "onResume called.");
-		locationTextView = (TextView)findViewById(R.id.textView1);
+		locationTextView = (TextView)findViewById(R.id.listItemName);
 //        android.location.Location lastLoc = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
 //        if (lastLoc != null) {
 //    		url = "https://api.foursquare.com/v2/venues/search?ll="+lastLoc.getLatitude()+","+lastLoc.getLongitude()+"&client_id=TRFZGGZKZOOA0GWNFOCQTUHDVDJZCU1JQZSLKHYF3OUUKSE2&client_secret=OBETZ5VJ3QSYAJ5YEQAJU0JR54BX1V2XOIF55VQS3MGT5ARP&v=20121116";
@@ -224,6 +225,16 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		datasource.close();
 		super.onPause();
 		locationManager.removeUpdates(this);
+	}
+	
+	@Override
+	protected void onStop(){
+		super.onStop();
+	}
+	
+	@Override
+	protected void onDestroy(){
+		super.onDestroy();
 	}
 	
 	@Override
@@ -254,16 +265,6 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 	            Toast.LENGTH_SHORT).show();
 	}
 	
-	@Override
-	protected void onStop(){
-		super.onStop();
-	}
-	
-	@Override
-	protected void onDestroy(){
-		super.onDestroy();
-	}
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -334,7 +335,6 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 			return null;
 		}
 	}
-
 
 	private boolean isNetworkAvailable() {
 	    ConnectivityManager connectivityManager 

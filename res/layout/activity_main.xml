@@ -77,7 +77,7 @@
                                 android:inputType="textEmailAddress" />
 
                             <TextView
-                                android:id="@+id/textView1"
+                                android:id="@+id/listItemName"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:text="You are here"
