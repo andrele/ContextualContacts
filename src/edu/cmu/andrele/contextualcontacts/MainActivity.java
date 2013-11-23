@@ -7,7 +7,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -15,7 +17,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,7 +37,11 @@ import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
@@ -44,7 +50,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
-public class MainActivity extends Activity implements LocationListener{
+public class MainActivity extends ListActivity implements LocationListener, OnClickListener{
 	
 	private String url = "https://api.foursquare.com/v2/venues/search?ll=40.4457696,-79.9494519&client_id=TRFZGGZKZOOA0GWNFOCQTUHDVDJZCU1JQZSLKHYF3OUUKSE2&client_secret=OBETZ5VJ3QSYAJ5YEQAJU0JR54BX1V2XOIF55VQS3MGT5ARP&v=20121116";
 	private SearchResponse lastResponse;
@@ -63,61 +69,18 @@ public class MainActivity extends Activity implements LocationListener{
 	private Uri fileUri;
 	public ImageButton imageButtonAvatar;
 	
+	// Other UI elements
+	public Button saveButton;
+	public Button clearButton;
+	public EditText fullName;
+	public EditText phoneNumber;
+	public EditText emailAddress;
+	
 	private boolean isGpsEnabled;
 	private boolean isLocationNetworkEnabled;
-
-	private boolean isNetworkAvailable() {
-	    ConnectivityManager connectivityManager 
-	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
-	}
 	
-	/** Create a file Uri for saving an image or video */
-	private static Uri getOutputMediaFileUri(int type){
-	      return Uri.fromFile(getOutputMediaFile(type));
-	}
-
-	/** Create a File for saving an image or video */
-	private static File getOutputMediaFile(int type){
-	    // To be safe, you should check that the SDCard is mounted
-	    // using Environment.getExternalStorageState() before doing this.
-
-	    File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
-	              Environment.DIRECTORY_PICTURES), "ContextualContacts");
-	    // This location works best if you want the created images to be shared
-	    // between applications and persist after your app has been uninstalled.
-
-	    // Create the storage directory if it does not exist
-	    if (! mediaStorageDir.exists()){
-	        if (! mediaStorageDir.mkdirs()){
-	            Log.d("MyCameraApp", "failed to create directory");
-	            return null;
-	        }
-	    }
-
-	    // Create a media file name
-	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-	    File mediaFile;
-	    if (type == MEDIA_TYPE_IMAGE){
-	        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
-	        "IMG_"+ timeStamp + ".jpg");
-	    } else {
-	        return null;
-	    }
-
-	    return mediaFile;
-	}
-	
-	private void dispatchImageCaptureIntent() {
-		// Setup camera intent
-		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-		fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
-		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-
-		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
-	}
-	
+	// ListView properties
+	private ContactsDataSource datasource;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +92,16 @@ public class MainActivity extends Activity implements LocationListener{
 		// Set up GPS and network checks
 //		isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
 //		isLocationNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
+		
+		// Setup list view
+		datasource = new ContactsDataSource(this);
+		datasource.open();
+		List<CContact> values = datasource.getAllContacts();
+		
+		// Use SimpleCursorAdapter to show the elements in ListView
+		ArrayAdapter<CContact> adapter = new ArrayAdapter<CContact>(this, android.R.layout.simple_list_item_1, values);
+		setListAdapter(adapter);
+		
 		
 		// Setup location services
 		locationTextView = (TextView)findViewById(R.id.textView1);
@@ -145,14 +118,17 @@ public class MainActivity extends Activity implements LocationListener{
 //			locationTextView.setText("Searching nearby...");
 		}
 		
+		// Setup buttons
 		imageButtonAvatar = (ImageButton)findViewById(R.id.imageButtonAvatar);
+		imageButtonAvatar.setOnClickListener(this);
+		saveButton = (Button)findViewById(R.id.btnSave);
+		saveButton.setOnClickListener(this);
+		clearButton = (Button)findViewById(R.id.btnClear);
+		clearButton.setOnClickListener(this);
+		fullName = (EditText)findViewById(R.id.editTextName);
+		phoneNumber = (EditText)findViewById(R.id.editTextPhone);
+		emailAddress = (EditText)findViewById(R.id.editTextEmail);
 		
-		imageButtonAvatar.setOnClickListener(new ImageButton.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dispatchImageCaptureIntent();
-			}
-		});
 		
 		TabHost tabHost=(TabHost)findViewById(android.R.id.tabhost);
 		tabHost.setup();
@@ -171,6 +147,25 @@ public class MainActivity extends Activity implements LocationListener{
 		lastResponse = null;
 
 		Log.d("andre", "OnCreate called");
+	}
+	
+	@Override
+	public void onClick(View view) {
+		ArrayAdapter<CContact> adapter = (ArrayAdapter<CContact>) getListAdapter();
+		CContact contact = null;
+		switch (view.getId()) {
+		case R.id.btnSave:
+			ArrayList<String> venueStrings = new ArrayList<String>();
+			venueStrings.add(locationTextView.getText().toString());
+			Uri newUri = Uri.parse("");
+			contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
+			adapter.add(contact);
+			adapter.notifyDataSetChanged();
+			break;
+		case R.id.imageButtonAvatar:
+			dispatchImageCaptureIntent();
+			break;
+		}
 	}
 	
 	@Override
@@ -206,6 +201,7 @@ public class MainActivity extends Activity implements LocationListener{
 	
 	@Override
 	protected void onResume(){
+		datasource.open();
 		super.onResume();
 		locationManager.requestLocationUpdates(provider, 400, 1, this);
 		Log.d("Andre", "onResume called.");
@@ -222,6 +218,7 @@ public class MainActivity extends Activity implements LocationListener{
 	
 	@Override
 	protected void onPause(){
+		datasource.close();
 		super.onPause();
 		locationManager.removeUpdates(this);
 	}
@@ -336,6 +333,56 @@ public class MainActivity extends Activity implements LocationListener{
 	}
 
 
+	private boolean isNetworkAvailable() {
+	    ConnectivityManager connectivityManager 
+	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+	    NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+	}
+	
+	/** Create a file Uri for saving an image or video */
+	private static Uri getOutputMediaFileUri(int type){
+	      return Uri.fromFile(getOutputMediaFile(type));
+	}
 
+	/** Create a File for saving an image or video */
+	private static File getOutputMediaFile(int type){
+	    // To be safe, you should check that the SDCard is mounted
+	    // using Environment.getExternalStorageState() before doing this.
+
+	    File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+	              Environment.DIRECTORY_PICTURES), "ContextualContacts");
+	    // This location works best if you want the created images to be shared
+	    // between applications and persist after your app has been uninstalled.
+
+	    // Create the storage directory if it does not exist
+	    if (! mediaStorageDir.exists()){
+	        if (! mediaStorageDir.mkdirs()){
+	            Log.d("MyCameraApp", "failed to create directory");
+	            return null;
+	        }
+	    }
+
+	    // Create a media file name
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    File mediaFile;
+	    if (type == MEDIA_TYPE_IMAGE){
+	        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
+	        "IMG_"+ timeStamp + ".jpg");
+	    } else {
+	        return null;
+	    }
+
+	    return mediaFile;
+	}
+	
+	private void dispatchImageCaptureIntent() {
+		// Setup camera intent
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+		fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+		intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+
+		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
+	}
 
 }

@@ -3,6 +3,7 @@ package edu.cmu.andrele.contextualcontacts;
 import java.util.ArrayList;
 
 import android.net.Uri;
+import android.util.Log;
 
 public class CContact {
 	public long id;
@@ -16,6 +17,7 @@ public class CContact {
 	// Contact constructors
 	public CContact() {
 		super();
+		this.venues = new ArrayList<String>();
 	}
 	
 	public CContact (long id, String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
@@ -27,7 +29,12 @@ public class CContact {
 		this.imageUri = imageUri;
 		this.latitude = latitude;
 		this.longitude = longitude;
-		this.venues = venues;
+		this.venues = new ArrayList<String>();
+		if (venues != null && !venues.isEmpty()) {
+			for (String venue : venues) {
+				this.venues.add(venue);
+			}
+		}
 	}
 	
 	public long getId() {
@@ -63,8 +70,16 @@ public class CContact {
 	}
 	
 	public void setVenuesFromString(String string) {
-		// Parse venues as CSV into ArrayList
-		String[] parts = string.split(", ");
+		Log.d("ANDRE", "String is: " + string + " Venues is: " + venues);
+		if (string != null) {
+			// Parse venues as CSV into ArrayList
+			String[] parts = string.split(", ");
+			Log.d("ANDRE", "Parts is: " + parts);
+			this.venues.clear();
+			for (int i = 0; i<parts.length;i++) {
+				venues.add(parts[i]);
+			}
+		}
 	}
 	
 	@Override

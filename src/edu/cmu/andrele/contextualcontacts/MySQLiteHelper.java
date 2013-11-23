@@ -21,7 +21,7 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public ArrayList<Venue> venues;
 	
 	private static final String DATABASE_NAME = "contacts.db";
-	private static final int DATABASE_VERSION = 1;
+	private static final int DATABASE_VERSION = 2;
 	
 	// Database creation sql statement
 	private static final String DATABASE_CREATE = 
