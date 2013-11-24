@@ -27,10 +27,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.location.Location;
-import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
@@ -39,6 +41,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Images;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
@@ -252,6 +255,58 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		fullName.requestFocus();
 	}
 	
+	public static float getOrientation(Context context, Uri uri) {
+	        if (uri.getScheme().equals("content")) {
+	        String[] projection = { Images.ImageColumns.ORIENTATION };
+	        Cursor c = context.getContentResolver().query(
+	                uri, projection, null, null, null);
+	        if (c.moveToFirst()) {
+	            return c.getInt(0);
+	        }
+	    } else if (uri.getScheme().equals("file")) {
+	        try {
+	            ExifInterface exif = new ExifInterface(uri.getPath());
+	            int rotation = (int)exifOrientationToDegrees(
+	                    exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+	                            ExifInterface.ORIENTATION_NORMAL));
+	            return rotation;
+	        } catch (IOException e) {
+	            Log.e(APPTAG, "Error checking exif", e);
+	        }
+	    }
+	        return 0f;
+	    }
+	
+	    private static float exifOrientationToDegrees(int exifOrientation) {
+	    if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_90) {
+	        return 90;
+	    } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_180) {
+	        return 180;
+	    } else if (exifOrientation == ExifInterface.ORIENTATION_ROTATE_270) {
+	        return 270;
+	    }
+	    return 0;
+    }
+	
+	    
+	public Bitmap photoWithOrientation(Uri photoUri) throws FileNotFoundException {
+		ContentResolver cr = getContentResolver();
+		InputStream in = cr.openInputStream(photoUri);
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inSampleSize=4;
+		options.inScaled=true;
+		Bitmap thumb = BitmapFactory.decodeStream(in, null, options);
+		Matrix matrix = new Matrix();
+		float rotation = getOrientation(this, fileUri);
+		if (rotation != 0f) {
+			matrix.preRotate(rotation);
+			Bitmap rotatedBitmap = Bitmap.createBitmap(thumb, 0, 0, thumb.getWidth(), thumb.getHeight(), matrix, true);
+			return rotatedBitmap;
+		} else {
+			return thumb;
+		}
+	}
+	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
@@ -262,13 +317,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 					Toast.makeText(this, "Image saved", Toast.LENGTH_LONG).show();
 					
 					try {
-						ContentResolver cr = getContentResolver();
-						InputStream in = cr.openInputStream(fileUri);
-						BitmapFactory.Options options = new BitmapFactory.Options();
-						options.inSampleSize=4;
-						options.inScaled=true;
-						Bitmap thumb = BitmapFactory.decodeStream(in, null, options);
-						imageButtonAvatar.setImageBitmap(thumb);
+						imageButtonAvatar.setImageBitmap(photoWithOrientation(fileUri));
 					} catch (FileNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -426,7 +475,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 			if (result != null) {
 				if (!result.response.venues.isEmpty()) {
 					lastResponse = result;
-					Log.d("MINE", "Result: " + result.response.venues.get(0).name);
+					Log.d("MINE", "First result: " + result.response.venues.get(0).name);
 					if (locationTextView != null) {
 						locationTextView.setText(result.response.venues.get(0).name);
 					}
