@@ -1,6 +1,7 @@
 package edu.cmu.andrele.contextualcontacts;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -80,6 +81,10 @@ public class ContactsDataSource {
 		}
 		
 		cursor.close();
+		
+		// Reverse the order of the list
+		Collections.reverse(contacts);
+		
 		return contacts;
 	}
 	
