@@ -229,7 +229,12 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 			} else {
 				ArrayList<String> venueStrings = new ArrayList<String>();
 				venueStrings.add(locationTextView.getText().toString());
-				Uri newUri = Uri.parse("");
+				Uri newUri = null;
+				if (fileUri == null || fileUri.toString().isEmpty()) {
+					newUri = Uri.parse("");
+				} else {
+					newUri = fileUri;
+				}
 				contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
 				if (contact != null) {
 					addToContacts(contact);
@@ -297,7 +302,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		options.inScaled=true;
 		Bitmap thumb = BitmapFactory.decodeStream(in, null, options);
 		Matrix matrix = new Matrix();
-		float rotation = getOrientation(this, fileUri);
+		float rotation = getOrientation(this, photoUri);
 		if (rotation != 0f) {
 			matrix.preRotate(rotation);
 			Bitmap rotatedBitmap = Bitmap.createBitmap(thumb, 0, 0, thumb.getWidth(), thumb.getHeight(), matrix, true);

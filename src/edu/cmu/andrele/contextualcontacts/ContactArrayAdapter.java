@@ -2,12 +2,16 @@ package edu.cmu.andrele.contextualcontacts;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
 import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.provider.MediaStore;
 import android.text.format.DateFormat;
 import android.view.LayoutInflater;
@@ -45,8 +49,24 @@ public class ContactArrayAdapter extends ArrayAdapter<CContact>{
 		
 		if (values.get(position).imageUri != null ) {
 	        try {
-				Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), values.get(position).imageUri);
-				avatar.setImageBitmap(bitmap);
+	        	
+	    		ContentResolver cr = context.getContentResolver();
+	    		InputStream in = cr.openInputStream(values.get(position).imageUri);
+	    		BitmapFactory.Options options = new BitmapFactory.Options();
+	    		options.inSampleSize=8;
+	    		options.inScaled=true;
+	    		Bitmap thumb = BitmapFactory.decodeStream(in, null, options);
+	    		Matrix matrix = new Matrix();
+	    		float rotation = MainActivity.getOrientation(context, values.get(position).imageUri);
+	    		if (rotation != 0f) {
+	    			matrix.preRotate(rotation);
+	    			Bitmap rotatedBitmap = Bitmap.createBitmap(thumb, 0, 0, thumb.getWidth(), thumb.getHeight(), matrix, true);
+					avatar.setImageBitmap(rotatedBitmap);
+	    		} else {
+	    			avatar.setImageBitmap(thumb);
+	    		}        	
+//				Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), values.get(position).imageUri);
+//				avatar.setImageBitmap(bitmap);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();
