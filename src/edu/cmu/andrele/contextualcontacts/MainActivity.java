@@ -435,7 +435,7 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 			 ContactsContract.Data.CONTENT_URI)
 			 	.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
 			 	.withValue(ContactsContract.Data.MIMETYPE,
-			 ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+			 ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE)
 				.withValue(
 			ContactsContract.CommonDataKinds.Note.NOTE, notes).build());
 		 }
