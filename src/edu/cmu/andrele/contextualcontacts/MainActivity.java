@@ -221,15 +221,19 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		CContact contact = null;
 		switch (view.getId()) {
 		case R.id.btnSave:
-			ArrayList<String> venueStrings = new ArrayList<String>();
-			venueStrings.add(locationTextView.getText().toString());
-			Uri newUri = Uri.parse("");
-			contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
-			if (contact != null) {
-				addToContacts(contact);
-				adapter.add(contact);
-				adapter.notifyDataSetChanged();
-				Toast.makeText(this, contact.fullName + " was saved in your contacts", Toast.LENGTH_LONG).show();
+			if (fullName.getText().toString().matches("")) {
+				Toast.makeText(this, "Please enter a name before saving", Toast.LENGTH_LONG).show();
+			} else {
+				ArrayList<String> venueStrings = new ArrayList<String>();
+				venueStrings.add(locationTextView.getText().toString());
+				Uri newUri = Uri.parse("");
+				contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
+				if (contact != null) {
+					addToContacts(contact);
+					adapter.add(contact);
+					adapter.notifyDataSetChanged();
+					Toast.makeText(this, contact.fullName + " was saved in your contacts", Toast.LENGTH_LONG).show();
+				}
 			}
 			break;
 		case R.id.btnClear:
@@ -607,8 +611,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		     Toast.makeText(this, "Exception: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 		 }
 	}
-
-
 
 	@Override
 	public void onConnectionFailed(ConnectionResult connectionResult) {
