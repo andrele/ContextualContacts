@@ -74,11 +74,9 @@ public class CContact {
 	}
 	
 	public void setVenuesFromString(String string) {
-		Log.d("ANDRE", "String is: " + string + " Venues is: " + venues);
 		if (string != null) {
 			// Parse venues as CSV into ArrayList
 			String[] parts = string.split(", ");
-			Log.d("ANDRE", "Parts is: " + parts);
 			this.venues.clear();
 			for (int i = 0; i<parts.length;i++) {
 				venues.add(parts[i]);

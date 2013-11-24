@@ -52,9 +52,7 @@ public class ContactsDataSource {
 		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
 		values.put(MySQLiteHelper.COLUMN_VENUES, arrayToCSV(venues));
 		values.put(MySQLiteHelper.COLUMN_DATE, now.getTime());
-		
-		Log.d("MINE", "Date int in createContact is: "+now.getTime());
-		
+				
 		long insertId = database.insert(MySQLiteHelper.TABLE_CONTACTS, null, values);
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_CONTACTS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
 		cursor.moveToFirst();
@@ -99,7 +97,6 @@ public class ContactsDataSource {
 		contact.setLong(cursor.getFloat(6));
 		contact.setVenuesFromString(cursor.getString(7));
 		contact.date.setTime(cursor.getLong(8));
-		Log.d("MINE", "Time in cursorToContact is: " + cursor.getInt(8));
 		return contact;
 	}
 }

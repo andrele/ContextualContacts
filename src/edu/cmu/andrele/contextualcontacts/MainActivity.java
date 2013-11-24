@@ -169,10 +169,20 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 				Toast.makeText(this, contact.fullName + " was saved in your contacts", Toast.LENGTH_LONG).show();
 			}
 			break;
+		case R.id.btnClear:
+			clearFields();
+			break;
 		case R.id.imageButtonAvatar:
 			dispatchImageCaptureIntent();
 			break;
 		}
+	}
+	
+	public void clearFields() {
+		fullName.setText("");		
+		phoneNumber.setText("");
+		emailAddress.setText("");
+		fullName.requestFocus();
 	}
 	
 	@Override
