@@ -44,7 +44,7 @@ import android.view.Window;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
@@ -69,7 +69,7 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 	public static final int MEDIA_TYPE_IMAGE = 1;
 	private static final int CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE = 100;
 	private Uri fileUri;
-	public ImageButton imageButtonAvatar;
+	public ImageView imageButtonAvatar;
 	
 	// Other UI elements
 	public Button saveButton;
@@ -122,7 +122,7 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		}
 		
 		// Setup buttons
-		imageButtonAvatar = (ImageButton)findViewById(R.id.imageButtonAvatar);
+		imageButtonAvatar = (ImageView)findViewById(R.id.imageButtonAvatar);
 		imageButtonAvatar.setOnClickListener(this);
 		saveButton = (Button)findViewById(R.id.btnSave);
 		saveButton.setOnClickListener(this);
@@ -399,6 +399,15 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		 String emailID = contact.emailAddress;
 		 String company = "";
 		 String jobTitle = "";
+		 SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd,yyyy");
+		 String notes = "";
+		 
+		 try {
+			notes = "Met at " + contact.venues.get(0) + " on " + dateFormat.format(contact.date);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		 ArrayList < ContentProviderOperation > ops = new ArrayList < ContentProviderOperation > ();
 
@@ -418,6 +427,17 @@ public class MainActivity extends ListActivity implements LocationListener, OnCl
 		         .withValue(
 		     ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME,
 		     DisplayName).build());
+		 }
+		 
+		 //------------------------------------------------------ Notes
+		 if (notes != null) {
+			 ops.add(ContentProviderOperation.newInsert(
+			 ContactsContract.Data.CONTENT_URI)
+			 	.withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+			 	.withValue(ContactsContract.Data.MIMETYPE,
+			 ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+				.withValue(
+			ContactsContract.CommonDataKinds.Note.NOTE, notes).build());
 		 }
 
 		 //------------------------------------------------------ Mobile Number                     

@@ -1,6 +1,7 @@
 package edu.cmu.andrele.contextualcontacts;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import android.content.ContentValues;
@@ -9,12 +10,13 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 public class ContactsDataSource {
 	// Database fields
 	private SQLiteDatabase database;
 	private MySQLiteHelper dbHelper;
-	private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_NAME, MySQLiteHelper.COLUMN_PHONE, MySQLiteHelper.COLUMN_EMAIL, MySQLiteHelper.COLUMN_IMAGEURI, MySQLiteHelper.COLUMN_LATITUDE, MySQLiteHelper.COLUMN_LONGITUDE, MySQLiteHelper.COLUMN_VENUES };
+	private String[] allColumns = { MySQLiteHelper.COLUMN_ID, MySQLiteHelper.COLUMN_NAME, MySQLiteHelper.COLUMN_PHONE, MySQLiteHelper.COLUMN_EMAIL, MySQLiteHelper.COLUMN_IMAGEURI, MySQLiteHelper.COLUMN_LATITUDE, MySQLiteHelper.COLUMN_LONGITUDE, MySQLiteHelper.COLUMN_VENUES, MySQLiteHelper.COLUMN_DATE };
 	
 	public ContactsDataSource(Context context) {
 		dbHelper = new MySQLiteHelper(context);
@@ -39,6 +41,7 @@ public class ContactsDataSource {
 	}
 	
 	public CContact createContact( String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
+		Date now = new Date();
 		ContentValues values = new ContentValues();
 		values.put(MySQLiteHelper.COLUMN_NAME, fullName);
 		values.put(MySQLiteHelper.COLUMN_PHONE, phoneNumber);
@@ -47,6 +50,10 @@ public class ContactsDataSource {
 		values.put(MySQLiteHelper.COLUMN_LATITUDE, latitude);
 		values.put(MySQLiteHelper.COLUMN_LONGITUDE, longitude);
 		values.put(MySQLiteHelper.COLUMN_VENUES, arrayToCSV(venues));
+		values.put(MySQLiteHelper.COLUMN_DATE, now.getTime());
+		
+		Log.d("MINE", "Date int in createContact is: "+now.getTime());
+		
 		long insertId = database.insert(MySQLiteHelper.TABLE_CONTACTS, null, values);
 		Cursor cursor = database.query(MySQLiteHelper.TABLE_CONTACTS, allColumns, MySQLiteHelper.COLUMN_ID + " = " + insertId, null, null, null, null);
 		cursor.moveToFirst();
@@ -86,6 +93,8 @@ public class ContactsDataSource {
 		contact.setLat(cursor.getFloat(5));
 		contact.setLong(cursor.getFloat(6));
 		contact.setVenuesFromString(cursor.getString(7));
+		contact.date.setTime(cursor.getLong(8));
+		Log.d("MINE", "Time in cursorToContact is: " + cursor.getInt(8));
 		return contact;
 	}
 }

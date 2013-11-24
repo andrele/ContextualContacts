@@ -18,10 +18,11 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String COLUMN_LATITUDE = "latitude";
 	public static final String COLUMN_LONGITUDE = "longitude";
 	public static final String COLUMN_VENUES = "venues";
+	public static final String COLUMN_DATE = "date";
 	public ArrayList<Venue> venues;
 	
 	private static final String DATABASE_NAME = "contacts.db";
-	private static final int DATABASE_VERSION = 2;
+	private static final int DATABASE_VERSION = 4;
 	
 	// Database creation sql statement
 	private static final String DATABASE_CREATE = 
@@ -33,7 +34,8 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_IMAGEURI + " TEXT,"
 			+ COLUMN_LATITUDE + " REAL,"
 			+ COLUMN_LONGITUDE + " REAL,"
-			+ COLUMN_VENUES + " TEXT);";
+			+ COLUMN_VENUES + " TEXT,"
+			+ COLUMN_DATE + " UNSIGNED BIG INT);";
 	
 	public MySQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);

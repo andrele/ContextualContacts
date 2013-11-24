@@ -1,6 +1,7 @@
 package edu.cmu.andrele.contextualcontacts;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import android.net.Uri;
 import android.util.Log;
@@ -13,11 +14,13 @@ public class CContact {
 	public Uri imageUri;
 	public float latitude, longitude;
 	public ArrayList<String> venues;
+	public Date date;
 	
 	// Contact constructors
 	public CContact() {
 		super();
 		this.venues = new ArrayList<String>();
+		this.date = new Date();
 	}
 	
 	public CContact (long id, String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
@@ -35,6 +38,7 @@ public class CContact {
 				this.venues.add(venue);
 			}
 		}
+		this.date = new Date();
 	}
 	
 	public long getId() {
