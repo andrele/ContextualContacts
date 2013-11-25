@@ -47,14 +47,16 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.Window;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -65,7 +67,7 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.gson.Gson;
 
-public class MainActivity extends ListActivity implements LocationListener, OnClickListener, GooglePlayServicesClient.ConnectionCallbacks,
+public class MainActivity extends ListActivity implements LocationListener, OnClickListener, OnFocusChangeListener, GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener {
 	
     // Debugging tag for the application
@@ -73,7 +75,8 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	
 	private String url = "https://api.foursquare.com/v2/venues/search?ll=40.4457696,-79.9494519&client_id=TRFZGGZKZOOA0GWNFOCQTUHDVDJZCU1JQZSLKHYF3OUUKSE2&client_secret=OBETZ5VJ3QSYAJ5YEQAJU0JR54BX1V2XOIF55VQS3MGT5ARP&v=20121116";
 	private SearchResponse lastResponse;
-	private TextView locationTextView;
+	private AutoCompleteTextView locationTextView;
+	private ArrayList<String> venueNames;
 	
 	// Location properties
 //	private LocationManager locationManager;
@@ -84,6 +87,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	private LocationClient mLocationClient;
 	private LocationRequest mLocationRequest;
     boolean mUpdatesRequested = false;
+    boolean mLocationEdited = false;
 
 
     public static final String SHARED_PREFERENCES = "edu.cmu.andrele.contextualcontacts.SHARED_PREFERENCES";
@@ -176,7 +180,11 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		
 		
 		// Setup location services
-		locationTextView = (TextView)findViewById(R.id.listItemName);
+		venueNames = new ArrayList<String>();
+		locationTextView = (AutoCompleteTextView)findViewById(R.id.locationText);
+		locationTextView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, venueNames));
+		locationTextView.setOnFocusChangeListener(this);
+		
 //		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
 //		Criteria criteria = new Criteria();
 //		provider = locationManager.getBestProvider(criteria, false);
@@ -224,6 +232,20 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	}
 	
 	@Override
+	public void onFocusChange(View view, boolean hasFocus) {
+		switch (view.getId()) {
+			case R.id.locationText:
+				if (hasFocus) {
+					mLocationEdited = true;
+					if (locationTextView.getText().toString().contentEquals("Unknown Location")) {
+						locationTextView.setText("");
+					}
+				}
+				break;
+		}
+	}
+	
+	@Override
 	public void onClick(View view) {
 		ContactArrayAdapter adapter = (ContactArrayAdapter) getListAdapter();
 		CContact contact = null;
@@ -232,15 +254,17 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 			if (fullName.getText().toString().matches("")) {
 				Toast.makeText(this, "Please enter a name before saving", Toast.LENGTH_LONG).show();
 			} else {
-				ArrayList<String> venueStrings = new ArrayList<String>();
-				venueStrings.add(locationTextView.getText().toString());
+				if (locationTextView.getText().toString().isEmpty()) {
+					locationTextView.setText("Unknown Location");
+				}
+				venueNames.add(0, locationTextView.getText().toString());
 				Uri newUri = null;
 				if (fileUri == null || fileUri.toString().isEmpty()) {
 					newUri = Uri.parse("");
 				} else {
 					newUri = fileUri;
 				}
-				contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueStrings);
+				contact = datasource.createContact(fullName.getText().toString(), phoneNumber.getText().toString(), emailAddress.getText().toString(), newUri, 10.0f, 10.0f, venueNames);
 				if (contact != null) {
 					addToContacts(contact);
 					adapter.add(contact);
@@ -270,6 +294,8 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		fullName.setText("");		
 		phoneNumber.setText("");
 		emailAddress.setText("");
+		locationTextView.setText("Unknown Location");
+		mLocationEdited = false;
 		fullName.requestFocus();
 	}
 	
@@ -405,7 +431,8 @@ GooglePlayServicesClient.OnConnectionFailedListener {
         }
 
 		Log.d("Andre", "onResume called.");
-		locationTextView = (TextView)findViewById(R.id.locationText);
+		locationTextView = (AutoCompleteTextView)findViewById(R.id.locationText);
+		mLocationEdited = false;
 	}
 	
 	@Override
@@ -470,19 +497,21 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	
 	private class FoursquareChecker extends AsyncTask<String, Integer, SearchResponse> {
 		protected SearchResponse doInBackground(String... urls) {
-
-			InputStream source = retreiveStream(urls[0]);
-			Log.d("MINE", "The source is " + source);
-			Gson gson = new Gson();
 			
-			Reader reader = new InputStreamReader(source);
-			
-			SearchResponse searchResponse = gson.fromJson(reader, SearchResponse.class);
-			
-			Log.d("MINE", "SR responses is: " + searchResponse.response);
-			
-			return searchResponse;
-			
+			if (urls != null) {
+				InputStream source = retreiveStream(urls[0]);
+				Log.d("MINE", "The source is " + source);
+				Gson gson = new Gson();
+				
+				Reader reader = new InputStreamReader(source);
+				
+				SearchResponse searchResponse = gson.fromJson(reader, SearchResponse.class);
+				
+				Log.d("MINE", "SR responses is: " + searchResponse.response);
+				
+				return searchResponse;
+			}
+			return null;
 		}
 		
 		protected void onProgressUpdate(Integer... progress) {
@@ -494,12 +523,16 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 				if (!result.response.venues.isEmpty()) {
 					lastResponse = result;
 					Log.d("MINE", "First result: " + result.response.venues.get(0).name);
-					if (locationTextView != null) {
+					if (locationTextView != null && !mLocationEdited) {
 						locationTextView.setText(result.response.venues.get(0).name);
+					}
+					venueNames.clear();
+					for (Venue venue : result.response.venues) {
+						venueNames.add(venue.name);
 					}
 				} else {
 					if (locationTextView != null) {
-						locationTextView.setText("No nearby results found");
+						locationTextView.setText("Unknown Location");
 					}
 				}
 			}

@@ -65,31 +65,24 @@
             android:text="&lt;Location>"
             android:textAppearance="?android:attr/textAppearanceMedium" />
 
-        <TextView
-            android:id="@+id/detailCity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="&lt;City>"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1" >
 
             <Button
+                android:id="@+id/btnSendText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Send Text" />
+
+            <Button
                 android:id="@+id/btnSendEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight=".5"
+                android:layout_weight="1"
                 android:text="Send Email" />
-
-            <Button
-                android:id="@+id/btnSendText"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight=".5"
-                android:text="Send Text" />
 
         </LinearLayout>
 

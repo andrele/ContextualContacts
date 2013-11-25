@@ -4,6 +4,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -17,16 +18,17 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore.Images;
-import android.support.v4.app.NavUtils;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class ContactDetailView extends Activity {
+public class ContactDetailView extends Activity implements OnClickListener {
 	private ImageView imageView;
-	private TextView nameText, phoneText, emailText, dateText, locationText, cityText;
+	private TextView nameText, phoneText, emailText, dateText, locationText;
 	private Button sendText, sendEmail;
 	
 	private CContact currentContact;
@@ -48,10 +50,12 @@ public class ContactDetailView extends Activity {
 		emailText = (TextView)findViewById(R.id.detailEmail);
 		phoneText = (TextView)findViewById(R.id.detailPhone);
 		locationText = (TextView)findViewById(R.id.detailLocation);
-		cityText = (TextView)findViewById(R.id.detailCity);
-		sendText = (Button)findViewById(R.id.btnSendText);
-		sendEmail = (Button)findViewById(R.id.btnSendEmail);
 		dateText = (TextView)findViewById(R.id.detailDate);
+		sendText = (Button)findViewById(R.id.btnSendText);
+		sendText.setOnClickListener(this);
+		sendEmail = (Button)findViewById(R.id.btnSendEmail);
+		sendEmail.setOnClickListener(this);
+		
 		currentContact = new CContact();
 		
 		
@@ -64,6 +68,57 @@ public class ContactDetailView extends Activity {
 		if (MainActivity.INTENT_ACTION_SHOW_DETAIL.equals(action)) {
 			updateContactDetails(intent.getIntExtra("position", -1));
 		}
+	}
+	
+	@Override
+	public void onClick(View view) {
+		switch (view.getId()) {
+		case R.id.btnSendEmail:
+			sendGreetingEmail(currentContact);
+			break;
+		case R.id.btnSendText:
+			sendGreetingText(currentContact);
+			break;
+		}
+	}
+	
+	private void sendGreetingEmail(CContact contact) {
+		String toField = contact.emailAddress;
+		String subjectField = "";
+		String bodyField = "";
+		if (!contact.venues.get(0).toString().contentEquals("Unknown Location")) {
+			subjectField = "Great meeting you at " + contact.venues.get(0);
+			bodyField = "Hello " + contact.fullName + ",\nIt was great meeting you at " + contact.venues.get(0) + ". Please keep in touch!\n\n";
+		} else {
+			subjectField = "Great to meet you, " + contact.fullName;
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd", Locale.US);
+			bodyField = "Hello " + contact.fullName + ",\nIt was great meeting you on " + dateFormatter.format(contact.date) + ". Please keep in touch!\n\n";
+		}
+		
+		Intent emailIntent = new Intent(android.content.Intent.ACTION_SEND);
+		emailIntent.setType("message/rfc822");
+		
+		emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {toField});
+		emailIntent.putExtra(Intent.EXTRA_SUBJECT, subjectField);
+		emailIntent.putExtra(Intent.EXTRA_TEXT, bodyField);
+		
+		startActivity(Intent.createChooser(emailIntent, "Send your greeting with:"));
+	}
+	
+	private void sendGreetingText(CContact contact) {
+		Uri smsUri = Uri.parse("sms:" + contact.phoneNumber);
+		Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
+		
+		String bodyField = "";
+		if (!contact.venues.get(0).toString().contentEquals("Unknown Location")) {
+			bodyField = "Hello " + contact.fullName + "! It was great meeting you at " + contact.venues.get(0) + ". Please keep in touch!";
+		} else {
+			SimpleDateFormat dateFormatter = new SimpleDateFormat("MMMM dd", Locale.US);
+			bodyField = "Hello " + contact.fullName + "! It was great meeting you on " + dateFormatter.format(contact.date) + ". Please keep in touch!";
+		}
+		
+		intent.putExtra("sms_body", bodyField);
+		startActivity(intent);
 	}
 	
     @Override
@@ -111,22 +166,27 @@ public class ContactDetailView extends Activity {
 				nameText.setText(contact.fullName);
 			} else {
 				nameText.setText("");
+				nameText.setVisibility(View.GONE);
 			}
 			
 			if (!contact.emailAddress.isEmpty() && contact.emailAddress != null) {
 				emailText.setText(contact.emailAddress);
 			} else {
 				emailText.setText("");
+				emailText.setVisibility(View.GONE);
+				sendEmail.setVisibility(View.INVISIBLE);
 			}
 			
 			if (!contact.phoneNumber.isEmpty() && contact.phoneNumber != null) {
 				phoneText.setText(contact.phoneNumber);
 			} else {
 				phoneText.setText("");
+				phoneText.setVisibility(View.GONE);
+				sendText.setVisibility(View.INVISIBLE);
 			}
 			
 			if (contact.date != null) {
-				SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy");
+				SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.US);
 				dateText.setText(dateFormat.format(contact.date));
 			}
 			

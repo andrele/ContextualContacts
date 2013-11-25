@@ -210,12 +210,11 @@ containing a value of this type.
         public static final int stevejobs=0x7f02001e;
     }
     public static final class id {
-        public static final int action_settings=0x7f05001f;
+        public static final int action_settings=0x7f05001e;
         public static final int btnClear=0x7f05000c;
         public static final int btnSave=0x7f05000d;
         public static final int btnSendEmail=0x7f050019;
-        public static final int btnSendText=0x7f05001a;
-        public static final int detailCity=0x7f050018;
+        public static final int btnSendText=0x7f050018;
         public static final int detailDate=0x7f050015;
         public static final int detailEmail=0x7f050013;
         public static final int detailImage=0x7f050010;
@@ -227,10 +226,10 @@ containing a value of this type.
         public static final int editTextPhone=0x7f050009;
         public static final int hybrid=0x7f050004;
         public static final int imageButtonAvatar=0x7f050007;
-        public static final int linearLayout1=0x7f05001b;
-        public static final int listItemAvatar=0x7f05001c;
-        public static final int listItemDetails=0x7f05001e;
-        public static final int listItemName=0x7f05001d;
+        public static final int linearLayout1=0x7f05001a;
+        public static final int listItemAvatar=0x7f05001b;
+        public static final int listItemDetails=0x7f05001d;
+        public static final int listItemName=0x7f05001c;
         public static final int listLayout=0x7f05000f;
         public static final int locationText=0x7f05000b;
         public static final int none=0x7f050000;
