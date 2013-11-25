@@ -45,9 +45,9 @@
                             <ImageView
                                 android:id="@+id/imageButtonAvatar"
                                 android:layout_width="fill_parent"
-                                android:layout_height="200dp"
+                                android:layout_height="190dp"
                                 android:padding="0dp"
-                                android:src="@drawable/stevejobs" />
+                                android:src="@drawable/capture_image" />
 
                             <EditText
                                 android:id="@+id/editTextName"

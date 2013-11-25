@@ -1,5 +1,6 @@
 package edu.cmu.andrele.contextualcontacts;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -655,6 +656,33 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		         .withValue(ContactsContract.CommonDataKinds.Organization.TITLE, jobTitle)
 		         .withValue(ContactsContract.CommonDataKinds.Organization.TYPE, ContactsContract.CommonDataKinds.Organization.TYPE_WORK)
 		         .build());
+		 }
+		 
+		 //------------------------------------------------------ Photo
+		 if (!contact.imageUri.toString().isEmpty()) {
+			 ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			 try {
+				 Bitmap contactPhoto = photoWithOrientation(contact.imageUri);
+				 contactPhoto.compress(Bitmap.CompressFormat.PNG, 75, stream);
+				 
+			     ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+			         .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+			         .withValue(ContactsContract.Data.MIMETYPE,
+			     ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+			         .withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, stream.toByteArray())
+			         .build());
+
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			 
+			 try {
+				 stream.flush();
+			 } catch (IOException e) {
+				 e.printStackTrace();
+			 }
+
 		 }
 
 		 // Asking the Contact provider to create a new contact                 
