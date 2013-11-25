@@ -17,7 +17,9 @@ import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore.Images;
+import android.support.v4.app.NavUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,6 +36,7 @@ public class ContactDetailView extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contact_detail_view);
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		// Open the datasource
 		dataSource = new ContactsDataSource(this);
@@ -62,6 +65,18 @@ public class ContactDetailView extends Activity {
 			updateContactDetails(intent.getIntExtra("position", -1));
 		}
 	}
+	
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+        case android.R.id.home:
+//            NavUtils.navigateUpFromSameTask(this);
+        	this.finish();
+            return true;
+        default:
+            return super.onOptionsItemSelected(item);
+        }
+    }
 	
 	@Override
 	protected void onResume() {

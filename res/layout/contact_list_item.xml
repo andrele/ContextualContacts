@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="?android:attr/listPreferredItemHeight"
-    android:padding="6dp" >
+    android:padding="0dp" >
 
     <LinearLayout
         android:id="@+id/linearLayout1"
@@ -12,8 +12,9 @@
 
         <ImageView
             android:id="@+id/listItemAvatar"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="?android:attr/listPreferredItemHeight"
+            android:layout_height="?android:attr/listPreferredItemHeight"
+            android:scaleType="centerCrop"
             android:src="@drawable/ic_launcher" />
 
         <LinearLayout
@@ -21,18 +22,19 @@
             android:layout_height="fill_parent"
             android:orientation="vertical"
             android:padding="6dp" >
-
             <TextView
                 android:id="@+id/listItemName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Medium Text"
+                android:maxLines="1"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
 
             <TextView
                 android:id="@+id/listItemDetails"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
+                android:maxLines="1"
                 android:text="Small Text"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 

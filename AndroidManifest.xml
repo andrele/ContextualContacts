@@ -36,6 +36,9 @@
             </intent-filter>
         </activity>
         <activity android:name="ContactDetailView" android:label="Detail View" android:permission="portrait" android:theme="@android:style/Theme.DeviceDefault.Light">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.cmu.andrele.contextualcontacts.MainActivity" />
             <intent-filter>
                 <action android:name="edu.cmu.andrele.contextualcontacts.SHOW_DETAIL"/>
             </intent-filter>
