@@ -34,6 +34,8 @@ public class ContactArrayAdapter extends ArrayAdapter<CContact>{
 	
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
+		// Invert this adapter to show newest at the top
+		int newPosition = values.size() - 1 - position;
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View rowView = inflater.inflate(R.layout.contact_list_item, parent, false);
 		TextView name = (TextView) rowView.findViewById(R.id.listItemName);
@@ -42,22 +44,22 @@ public class ContactArrayAdapter extends ArrayAdapter<CContact>{
 		
 		SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd,yyyy");
 		
-		name.setText(values.get(position).fullName);
+		name.setText(values.get(newPosition).fullName);
 		
-		String detailsString = "Met at " + values.get(position).venues.get(0) + " on " + dateFormat.format(values.get(position).date);
+		String detailsString = "Met at " + values.get(newPosition).venues.get(0) + " on " + dateFormat.format(values.get(newPosition).date);
 		details.setText(detailsString);
 		
-		if (values.get(position).imageUri != null ) {
+		if (values.get(newPosition).imageUri != null ) {
 	        try {
 	        	
 	    		ContentResolver cr = context.getContentResolver();
-	    		InputStream in = cr.openInputStream(values.get(position).imageUri);
+	    		InputStream in = cr.openInputStream(values.get(newPosition).imageUri);
 	    		BitmapFactory.Options options = new BitmapFactory.Options();
 	    		options.inSampleSize=8;
 	    		options.inScaled=true;
 	    		Bitmap thumb = BitmapFactory.decodeStream(in, null, options);
 	    		Matrix matrix = new Matrix();
-	    		float rotation = MainActivity.getOrientation(context, values.get(position).imageUri);
+	    		float rotation = MainActivity.getOrientation(context, values.get(newPosition).imageUri);
 	    		if (rotation != 0f) {
 	    			matrix.preRotate(rotation);
 	    			Bitmap rotatedBitmap = Bitmap.createBitmap(thumb, 0, 0, thumb.getWidth(), thumb.getHeight(), matrix, true);
@@ -65,7 +67,7 @@ public class ContactArrayAdapter extends ArrayAdapter<CContact>{
 	    		} else {
 	    			avatar.setImageBitmap(thumb);
 	    		}        	
-//				Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), values.get(position).imageUri);
+//				Bitmap bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), values.get(newPosition).imageUri);
 //				avatar.setImageBitmap(bitmap);
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block

@@ -81,7 +81,7 @@ public class ContactsDataSource {
 		cursor.close();
 		
 		// Reverse the order of the list
-		Collections.reverse(contacts);
+//		Collections.reverse(contacts);
 		
 		return contacts;
 	}
