@@ -41,6 +41,8 @@ public class ContactsDataSource {
 		return csvString;
 	}
 	
+
+	
 	public CContact createContact( String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
 		Date now = new Date();
 		ContentValues values = new ContentValues();
@@ -84,6 +86,16 @@ public class ContactsDataSource {
 //		Collections.reverse(contacts);
 		
 		return contacts;
+	}
+	
+	public CContact getContact(int position) {
+		List<CContact> allContacts = getAllContacts();
+		int newPosition = allContacts.size() - 1 - position;
+		CContact contact = allContacts.get(newPosition);
+		if (contact != null) {
+			return contact;
+		}
+		return null;
 	}
 	
 	private CContact cursorToContact(Cursor cursor) {

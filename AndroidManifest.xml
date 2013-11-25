@@ -28,11 +28,16 @@
         <activity
             android:name="edu.cmu.andrele.contextualcontacts.MainActivity"
             android:label="@string/app_name"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" android:theme="@android:style/Theme.DeviceDefault.Light">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name="ContactDetailView" android:label="Detail View" android:permission="portrait" android:theme="@android:style/Theme.DeviceDefault.Light">
+            <intent-filter>
+                <action android:name="edu.cmu.andrele.contextualcontacts.SHOW_DETAIL"/>
             </intent-filter>
         </activity>
     </application>

@@ -51,6 +51,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
@@ -104,6 +105,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
     public static final int FAST_CEILING_IN_SECONDS = 1;
     public static final long UPDATE_INTERVAL_IN_MILLISECONDS = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
     public static final long FAST_INTERVAL_CEILING_IN_MILLISECONDS = MILLISECONDS_PER_SECOND * FAST_CEILING_IN_SECONDS;
+    
+    // Detail View
+    public static final String INTENT_ACTION_SHOW_DETAIL = "edu.cmu.andrele.contextualcontacts.SHOW_DETAIL"; 
     
 	
 	// Camera properties
@@ -252,6 +256,14 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 			dispatchImageCaptureIntent();
 			break;
 		}
+	}
+	
+	@Override
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		Intent detailViewIntent = new Intent(this, ContactDetailView.class);
+		detailViewIntent.setAction(INTENT_ACTION_SHOW_DETAIL);
+		detailViewIntent.putExtra("position", position);
+		startActivity(detailViewIntent);
 	}
 	
 	public void clearFields() {
