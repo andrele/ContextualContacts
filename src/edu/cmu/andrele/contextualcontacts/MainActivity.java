@@ -77,6 +77,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	private SearchResponse lastResponse;
 	private AutoCompleteTextView locationTextView;
 	private ArrayList<String> venueNames;
+	private ArrayAdapter<String> venueAdapter;
 	
 	// Location properties
 //	private LocationManager locationManager;
@@ -181,8 +182,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		
 		// Setup location services
 		venueNames = new ArrayList<String>();
+		venueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, venueNames);
 		locationTextView = (AutoCompleteTextView)findViewById(R.id.locationText);
-		locationTextView.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, venueNames));
+		locationTextView.setAdapter(venueAdapter);
 		locationTextView.setOnFocusChangeListener(this);
 		
 //		locationManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
@@ -525,11 +527,13 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 					Log.d("MINE", "First result: " + result.response.venues.get(0).name);
 					if (locationTextView != null && !mLocationEdited) {
 						locationTextView.setText(result.response.venues.get(0).name);
+						Toast.makeText(getApplicationContext(), "Location detected: "+result.response.venues.get(0).name, Toast.LENGTH_LONG).show();
 					}
 					venueNames.clear();
 					for (Venue venue : result.response.venues) {
 						venueNames.add(venue.name);
 					}
+					venueAdapter.notifyDataSetChanged();
 				} else {
 					if (locationTextView != null) {
 						locationTextView.setText("Unknown Location");
