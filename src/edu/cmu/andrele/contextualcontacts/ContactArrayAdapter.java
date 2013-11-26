@@ -12,8 +12,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.provider.MediaStore;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +76,7 @@ public class ContactArrayAdapter extends ArrayAdapter<CContact>{
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();
-			} catch (IOException e) {
+			} catch (@SuppressWarnings("hiding") IOException e) {
 				// TODO Auto-generated catch block
 //				e.printStackTrace();
 			}

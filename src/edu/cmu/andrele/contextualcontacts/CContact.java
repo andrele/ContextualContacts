@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import android.net.Uri;
-import android.util.Log;
 
 /**
  * Contextual Contact object that stores a contact name, phone number, email address, location, date, and nearby venues

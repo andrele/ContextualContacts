@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -82,7 +83,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
     public static final String APPTAG = "ContextualContaxts";
 	
 	private String url = "https://api.foursquare.com/v2/venues/search?ll=40.4457696,-79.9494519&client_id=TRFZGGZKZOOA0GWNFOCQTUHDVDJZCU1JQZSLKHYF3OUUKSE2&client_secret=OBETZ5VJ3QSYAJ5YEQAJU0JR54BX1V2XOIF55VQS3MGT5ARP&v=20121116";
-	private SearchResponse lastResponse;
 	private AutoCompleteTextView locationTextView;
 	private ArrayList<String> venueNames;
 	public ArrayAdapter<String> venueAdapter;
@@ -135,9 +135,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	public EditText fullName;
 	public EditText phoneNumber;
 	public EditText emailAddress;
-	
-	private boolean isGpsEnabled;
-	private boolean isLocationNetworkEnabled;
 
 	// List view
 	private ContactsDataSource datasource;
@@ -178,10 +175,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		// Remove the title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
-		
-		// Set up GPS and network checks
-//		isGpsEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-//		isLocationNetworkEnabled = locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER);
 		
 		// Setup list view
 		datasource = new ContactsDataSource(this);
@@ -243,8 +236,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		tabHost.addTab(spec1);
 		tabHost.addTab(spec2);
 		
-		lastResponse = null;
-
 		Log.d("andre", "OnCreate called");
 	}
 	
@@ -547,7 +538,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		protected void onPostExecute(SearchResponse result) {
 			if (result != null) {
 				if (!result.response.venues.isEmpty()) {
-					lastResponse = result;
 					Log.d("MINE", "First result: " + result.response.venues.get(0).name);
 					if (locationTextView != null && !mLocationEdited) {
 						locationTextView.setText(result.response.venues.get(0).name);
@@ -630,7 +620,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	    }
 
 	    // Create a media file name
-	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+	    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date());
 	    File mediaFile;
 	    if (type == MEDIA_TYPE_IMAGE){
 	        mediaFile = new File(mediaStorageDir.getPath() + File.separator +
@@ -661,12 +651,10 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	private void addToContacts(CContact contact) {
 		String DisplayName = contact.fullName;
 		 String MobileNumber = contact.phoneNumber;
-		 String HomeNumber = "";
-		 String WorkNumber = "";
 		 String emailID = contact.emailAddress;
 		 String company = "";
 		 String jobTitle = "";
-		 SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd,yyyy");
+		 SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd,yyyy", Locale.US);
 		 String notes = "";
 		 
 		 try {
