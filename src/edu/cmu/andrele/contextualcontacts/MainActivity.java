@@ -184,7 +184,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		venueNames = new ArrayList<String>();
 		venueNames.add("HCII Lab");
 		locationTextView = (AutoCompleteTextView)findViewById(R.id.locationText);
-		venueAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, venueNames);
+		venueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, venueNames);
 		locationTextView.setAdapter(venueAdapter);
 		locationTextView.setOnFocusChangeListener(this);
 		
@@ -539,6 +539,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 						Log.d(APPTAG, "Adding " + venue.name);
 					}
 					Log.d(APPTAG, "Venues after population: " + venueNames);
+					venueAdapter.notifyDataSetInvalidated();
+					venueAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, venueNames);
+					locationTextView.setAdapter(venueAdapter);
 					venueAdapter.notifyDataSetChanged();
 				} else {
 					if (locationTextView != null) {
