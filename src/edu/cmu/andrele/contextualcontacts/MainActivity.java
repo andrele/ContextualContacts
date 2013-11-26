@@ -70,6 +70,9 @@ import com.google.gson.Gson;
 public class MainActivity extends ListActivity implements LocationListener, OnClickListener, OnFocusChangeListener, GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener {
 	
+	// Global context
+	Context mContext;
+	
     // Debugging tag for the application
     public static final String APPTAG = "ContextualContaxts";
 	
@@ -161,6 +164,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mContext = this;
 		// Remove the title bar
 		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.activity_main);
@@ -184,7 +188,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		venueNames = new ArrayList<String>();
 		venueNames.add("HCII Lab");
 		locationTextView = (AutoCompleteTextView)findViewById(R.id.locationText);
-		venueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, venueNames);
+		venueAdapter = new ArrayAdapter<String>(mContext, android.R.layout.simple_dropdown_item_1line, venueNames);
 		locationTextView.setAdapter(venueAdapter);
 		locationTextView.setOnFocusChangeListener(this);
 		
@@ -532,16 +536,10 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 					} else {
 						Toast.makeText(getApplicationContext(), "Your location has been updated", Toast.LENGTH_LONG).show();
 					}
-					venueNames.clear();
-					Log.d(APPTAG, "Cleared venueNames:" + venueNames);
+					venueAdapter.clear();
 					for (Venue venue : result.response.venues) {
-						venueNames.add(venue.name);
-						Log.d(APPTAG, "Adding " + venue.name);
+						venueAdapter.add(venue.name);
 					}
-					Log.d(APPTAG, "Venues after population: " + venueNames);
-					venueAdapter.notifyDataSetInvalidated();
-					venueAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_dropdown_item_1line, venueNames);
-					locationTextView.setAdapter(venueAdapter);
 					venueAdapter.notifyDataSetChanged();
 				} else {
 					if (locationTextView != null) {
