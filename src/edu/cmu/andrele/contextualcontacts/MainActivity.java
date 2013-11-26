@@ -67,6 +67,11 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.gson.Gson;
 
+/**
+ * Main activity that manages the Add Contact and History tabs
+ * @author andrele
+ *
+ */
 public class MainActivity extends ListActivity implements LocationListener, OnClickListener, OnFocusChangeListener, GooglePlayServicesClient.ConnectionCallbacks,
 GooglePlayServicesClient.OnConnectionFailedListener {
 	
@@ -143,6 +148,11 @@ GooglePlayServicesClient.OnConnectionFailedListener {
     // Handle to a SharedPreferences editor
     SharedPreferences.Editor mEditor;
 	
+    /**
+     * Inner class that handles error dialog fragments from Google Play, etc.
+     * @author andrele
+     *
+     */
 	public static class ErrorDialogFragment extends DialogFragment {
 		private Dialog mDialog;
 		
@@ -297,6 +307,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		startActivity(detailViewIntent);
 	}
 	
+	/**
+	 * Resets all EditText fields to default settings and sets focus to Name field
+	 */
 	public void clearFields() {
 		fullName.setText("");		
 		phoneNumber.setText("");
@@ -306,6 +319,12 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		fullName.requestFocus();
 	}
 	
+	/**
+	 * Returns the orientation of a photo at the specified Uri
+	 * @param context Current application context
+	 * @param uri Uri of the photo
+	 * @return
+	 */
 	public static float getOrientation(Context context, Uri uri) {
 	        if (uri.getScheme().equals("content")) {
 	        String[] projection = { Images.ImageColumns.ORIENTATION };
@@ -339,7 +358,12 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	    return 0;
     }
 	
-	    
+	/**
+	 * Helper method that returns a properly rotated Bitmap from a Uri    
+	 * @param photoUri Uri of photo that needs to be rotated
+	 * @return Bitmap that is rotated
+	 * @throws FileNotFoundException
+	 */
 	public Bitmap photoWithOrientation(Uri photoUri) throws FileNotFoundException {
 		ContentResolver cr = getContentResolver();
 		InputStream in = cr.openInputStream(photoUri);
@@ -357,6 +381,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 			return thumb;
 		}
 	}
+
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -397,7 +422,10 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		}
 	}
 	
-	// Check to see if GooglePlay services is available
+	/**
+	 * Checks to see if Google Play services is connected
+	 * @return
+	 */
 	private boolean servicesConnected() {
 		int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
 		if (ConnectionResult.SUCCESS == resultCode) {
@@ -479,22 +507,6 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		}
 	}
 	
-	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void onProviderEnabled(String provider) {
-	    Toast.makeText(this, "Enabled new provider " + provider,
-	            Toast.LENGTH_SHORT).show();
-		
-	}
-
-	public void onStatusChanged(String provider, int status, Bundle extras) {
-	    Toast.makeText(this, "Enabled new provider " + provider,
-	            Toast.LENGTH_SHORT).show();
-	}
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -502,6 +514,13 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		return true;
 	}
 	
+	
+	/**
+	 * Private inner class that extends AsyncTask to check Foursquare for nearby venues given a latitude and longitude
+	 * Updates venueNames with new venues
+	 * @author andrele
+	 *
+	 */
 	private class FoursquareChecker extends AsyncTask<String, Integer, SearchResponse> {
 		protected SearchResponse doInBackground(String... urls) {
 			
@@ -576,6 +595,10 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		}
 	}
 
+	/**
+	 * Checks to see if network is available
+	 * @return
+	 */
 	private boolean isNetworkAvailable() {
 	    ConnectivityManager connectivityManager 
 	          = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -619,6 +642,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	    return mediaFile;
 	}
 	
+	/**
+	 * Build and dispatch an ImageCapture intent
+	 */
 	private void dispatchImageCaptureIntent() {
 		// Setup camera intent
 		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -628,6 +654,10 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		startActivityForResult(intent, CAPTURE_IMAGE_ACTIVITY_REQUEST_CODE);
 	}
 	
+	/**
+	 * Method to add a contact to the address book
+	 * @param contact Contextual Contact object
+	 */
 	private void addToContacts(CContact contact) {
 		String DisplayName = contact.fullName;
 		 String MobileNumber = contact.phoneNumber;

@@ -6,6 +6,11 @@ import java.util.Date;
 import android.net.Uri;
 import android.util.Log;
 
+/**
+ * Contextual Contact object that stores a contact name, phone number, email address, location, date, and nearby venues
+ * @author andrele
+ *
+ */
 public class CContact {
 	public long id;
 	public String fullName;
@@ -16,13 +21,26 @@ public class CContact {
 	public ArrayList<String> venues;
 	public Date date;
 	
-	// Contact constructors
+	/**
+	 * Empty Constructor
+	 */
 	public CContact() {
 		super();
 		this.venues = new ArrayList<String>();
 		this.date = new Date();
 	}
 	
+	/**
+	 * Main constructor
+	 * @param id Id added by the database
+	 * @param fullName Name of contact
+	 * @param phoneNumber Phone number of contact
+	 * @param emailAddress Email address of contact
+	 * @param imageUri Uri that points to user's image
+	 * @param latitude Latitude of where the contact was added
+	 * @param longitude Longitude of where the contact was added
+	 * @param venues List of nearby venues
+	 */
 	public CContact (long id, String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
 		super();
 		this.id = id;

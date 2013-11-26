@@ -13,6 +13,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.util.Log;
 
+/**
+ * Data source to manage the history tab list
+ * @author andrele
+ *
+ */
 public class ContactsDataSource {
 	// Database fields
 	private SQLiteDatabase database;
@@ -42,7 +47,17 @@ public class ContactsDataSource {
 	}
 	
 
-	
+	/**
+	 * Adds a new Contact to the database and returns newly created Contact
+	 * @param fullName Name of contact
+	 * @param phoneNumber Phone number of contact
+	 * @param emailAddress Email address of contact
+	 * @param imageUri Image Uri of contact
+	 * @param latitude Latitude where it was saved
+	 * @param longitude Longitude where it was saved
+	 * @param venues List of strings that represent nearby locations at the time
+	 * @return
+	 */
 	public CContact createContact( String fullName, String phoneNumber, String emailAddress, Uri imageUri, float latitude, float longitude, ArrayList<String> venues) {
 		Date now = new Date();
 		ContentValues values = new ContentValues();
@@ -63,12 +78,20 @@ public class ContactsDataSource {
 		return newContact;
 	}
 	
+	/**
+	 * Remove a contact from the database
+	 * @param contact Contact to be removed
+	 */
 	public void deleteContact(CContact contact) {
 		long id = contact.getId();
 		System.out.println("Contact deleted with id: " + id);
 		database.delete(MySQLiteHelper.TABLE_CONTACTS, MySQLiteHelper.COLUMN_ID + " = " + id, null);
 	}
 	
+	/**
+	 * Get a list of all contacts in the database
+	 * @return List of CContact objects
+	 */
 	public List<CContact> getAllContacts() {
 		List<CContact> contacts = new ArrayList<CContact>();
 		
@@ -88,6 +111,11 @@ public class ContactsDataSource {
 		return contacts;
 	}
 	
+	/**
+	 * Gets a contact at a specified position
+	 * @param position Index of contact
+	 * @return CContact object at specified location
+	 */
 	public CContact getContact(int position) {
 		List<CContact> allContacts = getAllContacts();
 		int newPosition = allContacts.size() - 1 - position;
@@ -98,6 +126,11 @@ public class ContactsDataSource {
 		return null;
 	}
 	
+	/**
+	 * Builds a contact at the current cursor location
+	 * @param cursor Current cursor position
+	 * @return CContact object at current Cursor location
+	 */
 	private CContact cursorToContact(Cursor cursor) {
 		CContact contact = new CContact();
 		contact.setId(cursor.getLong(0));

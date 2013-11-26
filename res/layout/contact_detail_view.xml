@@ -74,11 +74,19 @@
                 android:id="@+id/btnSendText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="10dp"
+                android:background="#FF959595"
+                android:textColor="#FFFFFFFF"
                 android:layout_weight="1"
                 android:text="Send Text" />
 
             <Button
                 android:id="@+id/btnSendEmail"
+                style="?android:attr/borderlessButtonStyle"
+                android:layout_margin="10dp"
+                android:background="#FF959595"
+                android:textColor="#FFFFFFFF"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"

@@ -44,6 +44,7 @@
 
                             <ImageView
                                 android:id="@+id/imageButtonAvatar"
+                                android:contentDescription="Image of current contact"
                                 android:layout_width="fill_parent"
                                 android:layout_height="190dp"
                                 android:scaleType="centerCrop"
@@ -93,17 +94,23 @@
 
                                 <Button
                                     android:id="@+id/btnClear"
+                                   style="?android:attr/borderlessButtonStyle"
+                                   android:background="#FF959595"
+                                   android:textColor="#FFFFFFFF"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="10dp"
+                                    android:layout_margin="10dp"
                                     android:layout_weight="0.5"
                                     android:text="Clear" />
 
                                 <Button
                                     android:id="@+id/btnSave"
+                                    style="?android:attr/borderlessButtonStyle"
+                                    android:background="#FF25B0E5"
+                                    android:textColor="#FFFFFFFF"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginTop="10dp"
+                                    android:layout_margin="10dp"
                                     android:layout_weight="0.5"
                                     android:text="Save" />
                             </LinearLayout>

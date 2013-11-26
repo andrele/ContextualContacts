@@ -6,7 +6,11 @@ import java.util.TimerTask;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-
+/**
+ * Activity that shows an initial splash screen before running the Main Activity
+ * @author andrele
+ *
+ */
 public class SplashActivity extends Activity {
 	private long splashDelay = 1500;
 	

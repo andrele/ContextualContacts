@@ -21,6 +21,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+/**
+ * Contact ArrayAdapter that binds the Contacts SQLite database to the History list view. 
+ * Contacts that are added are also updated using this adapter
+ * @author andrele
+ *
+ */
 @SuppressLint("SimpleDateFormat")
 public class ContactArrayAdapter extends ArrayAdapter<CContact>{
 	private final Context context;

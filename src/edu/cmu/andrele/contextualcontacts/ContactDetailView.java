@@ -25,7 +25,11 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+/**
+ * Activity that shows detailed information on the contact selected from the History list
+ * @author andrele
+ *
+ */
 public class ContactDetailView extends Activity implements OnClickListener {
 	private ImageView imageView;
 	private TextView nameText, phoneText, emailText, dateText, locationText;
@@ -35,6 +39,7 @@ public class ContactDetailView extends Activity implements OnClickListener {
 	
 	private ContactsDataSource dataSource;
 	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contact_detail_view);
@@ -82,6 +87,11 @@ public class ContactDetailView extends Activity implements OnClickListener {
 		}
 	}
 	
+	/**
+	 * Build a greeting email intent and start activity. Based on the available information in the CContact object, 
+	 * it will attempt to phrase the greeting appropriately
+	 * @param contact Contact to send a email to
+	 */
 	private void sendGreetingEmail(CContact contact) {
 		String toField = contact.emailAddress;
 		String subjectField = "";
@@ -105,6 +115,11 @@ public class ContactDetailView extends Activity implements OnClickListener {
 		startActivity(Intent.createChooser(emailIntent, "Send your greeting with:"));
 	}
 	
+	/**
+	 * Build a greeting text message intent and start activity. Based on the available information in the CContact object, 
+	 * it will attempt to phrase the greeting appropriately
+	 * @param contact Contact to send a text greeting to
+	 */
 	private void sendGreetingText(CContact contact) {
 		Uri smsUri = Uri.parse("sms:" + contact.phoneNumber);
 		Intent intent = new Intent(Intent.ACTION_VIEW, smsUri);
@@ -145,7 +160,10 @@ public class ContactDetailView extends Activity implements OnClickListener {
 		super.onPause();
 	}
 	
-	
+	/**
+	 * Populates the view with Contact information.
+	 * @param position Row on the list that was pressed
+	 */
 	private void updateContactDetails(int position) {
 		if (position == -1) {
 			Log.d(MainActivity.APPTAG, "Error fetching contact details. Positon -1");
@@ -198,6 +216,12 @@ public class ContactDetailView extends Activity implements OnClickListener {
 		}
 	}
 	
+	/**
+	 * Gets the orientation of a photo given a Uri
+	 * @param context Current application context
+	 * @param uri Uri of a photo
+	 * @return Rotation in degrees
+	 */
 	public static float getOrientation(Context context, Uri uri) {
 	    if (uri.getScheme().equals("content")) {
 	        String[] projection = { Images.ImageColumns.ORIENTATION };
@@ -231,7 +255,12 @@ public class ContactDetailView extends Activity implements OnClickListener {
 	    return 0;
     }
 
-    
+    /**
+     * Loads a Bitmap from a Uri and rotates it before returning it
+     * @param photoUri Uri of the Bitmap to be returned
+     * @return Bitmap of the rotated photo
+     * @throws FileNotFoundException
+     */
 	public Bitmap photoWithOrientation(Uri photoUri) throws FileNotFoundException {
 		ContentResolver cr = getContentResolver();
 		InputStream in = cr.openInputStream(photoUri);

@@ -8,6 +8,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 import android.util.Log;
 
+/**
+ * This class defines the database schema, creates tables if doesn't exist, and maintains a connection to the SQlite Database
+ * @author andrele
+ *
+ */
 public class MySQLiteHelper extends SQLiteOpenHelper {
 	public static final String TABLE_CONTACTS = "contacts";
 	public static final String COLUMN_ID = "_id";
@@ -37,6 +42,10 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			+ COLUMN_VENUES + " TEXT,"
 			+ COLUMN_DATE + " UNSIGNED BIG INT);";
 	
+	/**
+	 * Constructor function
+	 * @param context Current application context
+	 */
 	public MySQLiteHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
 	}
