@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<attr name="recallBlue" format="reference" />
+	<attr name="recallBlueDark" format="reference" />
+	<attr name="recallGray" format="reference" />    
+	<attr name="recallGrayDark" format="reference" />
+</resources>

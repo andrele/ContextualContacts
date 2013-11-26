@@ -94,9 +94,8 @@
 
                                 <Button
                                     android:id="@+id/btnClear"
-                                   style="?android:attr/borderlessButtonStyle"
-                                   android:background="#FF959595"
-                                   android:textColor="#FFFFFFFF"
+                                    style="@style/GrayButton"
+                                    android:textColor="#FFFFFFFF"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_margin="10dp"
@@ -105,8 +104,7 @@
 
                                 <Button
                                     android:id="@+id/btnSave"
-                                    style="?android:attr/borderlessButtonStyle"
-                                    android:background="#FF25B0E5"
+                                    style="@style/BlueButton"
                                     android:textColor="#FFFFFFFF"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="recallBlueDark">#FF2097B2</color>
+    <color name="recallBlue">#FF25b0E5</color>
+    <color name="recallGrayDark">#FF666666</color>
+    <color name="recallGray">#FF959595</color>
+</resources>

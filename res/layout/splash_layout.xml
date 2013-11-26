@@ -3,7 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:orientation="vertical"
-    android:background="#FF25B0E5" >
+    android:background="@color/recallBlue" >
 
     <ImageView
         android:id="@+id/imageView1"
@@ -12,6 +12,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
+        android:contentDescription="Recall Logo"
         android:src="@drawable/appsplash" />
 
 </RelativeLayout>
