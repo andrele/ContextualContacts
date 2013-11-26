@@ -77,7 +77,7 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 	private SearchResponse lastResponse;
 	private AutoCompleteTextView locationTextView;
 	private ArrayList<String> venueNames;
-	private ArrayAdapter<String> venueAdapter;
+	public ArrayAdapter<String> venueAdapter;
 	
 	// Location properties
 //	private LocationManager locationManager;
@@ -182,8 +182,9 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 		
 		// Setup location services
 		venueNames = new ArrayList<String>();
-		venueAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, venueNames);
+		venueNames.add("HCII Lab");
 		locationTextView = (AutoCompleteTextView)findViewById(R.id.locationText);
+		venueAdapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_dropdown_item_1line, venueNames);
 		locationTextView.setAdapter(venueAdapter);
 		locationTextView.setOnFocusChangeListener(this);
 		
@@ -527,12 +528,17 @@ GooglePlayServicesClient.OnConnectionFailedListener {
 					Log.d("MINE", "First result: " + result.response.venues.get(0).name);
 					if (locationTextView != null && !mLocationEdited) {
 						locationTextView.setText(result.response.venues.get(0).name);
-						Toast.makeText(getApplicationContext(), "Location detected: "+result.response.venues.get(0).name, Toast.LENGTH_LONG).show();
+						Toast.makeText(getApplicationContext(), "Your location has been updated to:\n"+result.response.venues.get(0).name, Toast.LENGTH_LONG).show();
+					} else {
+						Toast.makeText(getApplicationContext(), "Your location has been updated", Toast.LENGTH_LONG).show();
 					}
 					venueNames.clear();
+					Log.d(APPTAG, "Cleared venueNames:" + venueNames);
 					for (Venue venue : result.response.venues) {
 						venueNames.add(venue.name);
+						Log.d(APPTAG, "Adding " + venue.name);
 					}
+					Log.d(APPTAG, "Venues after population: " + venueNames);
 					venueAdapter.notifyDataSetChanged();
 				} else {
 					if (locationTextView != null) {
